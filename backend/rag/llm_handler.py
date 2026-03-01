@@ -3,8 +3,8 @@ def generate_response(question, context):
 
     docs = get_documents()
 
-    location = context.get("location", "Unknown")
-    aqi = context.get("aqi", "N/A")
+    location = context.get("location")
+    aqi = context.get("aqi")
     stress = context.get("stress_score", 0)
 
     knowledge = docs[0]["content"]
