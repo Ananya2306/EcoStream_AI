@@ -1,29 +1,16 @@
-# ingestion/aqi_stream.py
+from streaming.state_manager import get_latest_state
+from streaming.alerts import get_alerts
 
-import pathway as pw
-import random
-import time
-from datetime import datetime
+def get_stream_payload():
+    """
+    Combines live metrics + alerts
+    into a single stream-ready response.
+    """
 
-def generate_aqi():
-    """Simulates AQI values continuously"""
-    while True:
-        yield {
-            "location": "Noida",
-            "aqi": random.randint(80, 400),
-            "timestamp": datetime.utcnow()
-        }
-        time.sleep(3)
+    state = get_latest_state()
+    alerts = get_alerts()
 
-def aqi_stream():
-    schema = pw.Schema.from_columns(
-        location=str,
-        aqi=int,
-        timestamp=pw.DateTimeUtc
-    )
-
-    return pw.io.python.read(
-        generate_aqi,
-        schema=schema,
-        autocommit_duration_ms=1000
-    )
+    return {
+        "metrics": state,
+        "alerts": alerts
+    }

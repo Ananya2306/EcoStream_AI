@@ -59,7 +59,7 @@ function AnimatedGaugeNumber({ value }: { value: number }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
-  return <>{display.toFixed(1)}</>
+  return <>{display ? display.toFixed(1) : "0.0"}</>
 }
 
 export function StressGauge({ score, riskLevel }: StressGaugeProps) {

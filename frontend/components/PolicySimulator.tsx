@@ -29,20 +29,17 @@ function AnimatedSimNumber({ value }: { value: number }) {
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
-  return <>{display.toFixed(1)}</>
+  return <>{display ? display.toFixed(1) : "0.0"}</>
 }
 
 function ComparisonCard({
-  label,
   current,
   projected,
   unit,
   improved,
 }: {
-  label: string
   current: number
   projected: number
   unit: string
@@ -54,12 +51,14 @@ function ComparisonCard({
         <p className="text-[10px] font-mono text-muted-foreground uppercase mb-1">
           Current
         </p>
-        <p className="text-lg font-mono font-bold text-foreground tabular-nums">
+        <p className="text-lg font-mono font-bold tabular-nums">
           <AnimatedSimNumber value={current} />
         </p>
         <p className="text-[10px] font-mono text-muted-foreground">{unit}</p>
       </div>
+
       <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
+
       <div className="flex-1 text-center">
         <p className="text-[10px] font-mono text-muted-foreground uppercase mb-1">
           Projected
@@ -80,35 +79,58 @@ function ComparisonCard({
 export function PolicySimulator() {
   const [trafficReduction, setTrafficReduction] = useState(0)
   const [loading, setLoading] = useState(false)
+
   const simulationResult = useEnvironmentalStore((s) => s.simulationResult)
   const setSimulationResult = useEnvironmentalStore(
     (s) => s.setSimulationResult
   )
 
-  const handleSimulate = useCallback(async (value: number) => {
-    if (value === 0) {
-      setSimulationResult(null)
-      return
-    }
-    setLoading(true)
-    try {
-      const result = await simulatePolicy(value)
-      setSimulationResult(result)
-    } catch {
-      // handle error silently
-    } finally {
-      setLoading(false)
-    }
-  }, [setSimulationResult])
+  const liveMetrics = useEnvironmentalStore((s) => s.liveMetrics)
 
-  // Debounce simulation calls
+  // 🔥 THIS WAS MISSING / WRONG BEFORE
+  const handleSimulate = useCallback(
+    async (value: number) => {
+      if (!liveMetrics) return
+
+      if (value === 0) {
+        setSimulationResult(null)
+        return
+      }
+
+      setLoading(true)
+      try {
+        const result = await simulatePolicy(
+          liveMetrics.aqi,
+          liveMetrics.temperature
+        )
+
+        setSimulationResult(result)
+      } catch (err) {
+        console.error("Simulation error:", err)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [liveMetrics, setSimulationResult]
+  )
+  useEffect(() => {
+  if (!liveMetrics) return
+  if (trafficReduction === 0) return
+
+  handleSimulate(trafficReduction)
+}, [liveMetrics, trafficReduction, handleSimulate])
+  // Debounce
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   function handleSliderChange(value: number[]) {
     const val = value[0]
     setTrafficReduction(val)
+
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    timeoutRef.current = setTimeout(() => handleSimulate(val), 300)
+
+    timeoutRef.current = setTimeout(() => {
+      handleSimulate(val)
+    }, 300)
   }
 
   return (
@@ -117,20 +139,19 @@ export function PolicySimulator() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      {/* Simulation mode badge */}
       <div className="absolute top-3 right-3">
         <span className="text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-gp-cyan/10 text-gp-cyan border border-gp-cyan/20">
           Simulation Mode
         </span>
       </div>
 
-      {/* Header */}
       <div className="flex items-center gap-2 mb-1">
         <FlaskConical className="h-4 w-4 text-gp-cyan" />
-        <span className="text-xs font-mono uppercase tracking-wider text-foreground">
+        <span className="text-xs font-mono uppercase tracking-wider">
           Policy Simulator
         </span>
       </div>
+
       <p className="text-[10px] font-mono text-muted-foreground mb-4">
         Not affecting live stream
       </p>
@@ -138,95 +159,59 @@ export function PolicySimulator() {
       {/* Slider */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1.5">
-            <Sliders className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-xs font-mono text-secondary-foreground">
-              Traffic Reduction
-            </span>
-          </div>
+          <span className="text-xs font-mono">Traffic Reduction</span>
           <motion.span
             key={trafficReduction}
             initial={{ scale: 1.2 }}
             animate={{ scale: 1 }}
-            className="text-sm font-mono font-bold text-gp-cyan tabular-nums"
+            className="text-sm font-mono font-bold text-gp-cyan"
           >
             {trafficReduction}%
           </motion.span>
         </div>
+
         <Slider
           value={[trafficReduction]}
           onValueChange={handleSliderChange}
           max={50}
           min={0}
           step={1}
-          className="w-full"
         />
-        <div className="flex justify-between mt-1">
-          <span className="text-[9px] font-mono text-muted-foreground">
-            0%
-          </span>
-          <span className="text-[9px] font-mono text-muted-foreground">
-            50%
-          </span>
-        </div>
       </div>
 
       {/* Results */}
       {loading && (
-        <div className="flex items-center justify-center py-6">
-          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-            <span className="h-2 w-2 rounded-full bg-gp-cyan animate-pulse" />
-            Computing projection...
-          </div>
+        <div className="text-center py-6 text-xs font-mono text-muted-foreground">
+          Computing projection...
         </div>
       )}
 
       {!loading && simulationResult && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
-        >
-          {/* Comparison Cards */}
-          <div className="space-y-3">
-            <ComparisonCard
-              label="AQI"
-              current={simulationResult.currentAqi}
-              projected={simulationResult.projectedAqi}
-              unit="AQI"
-              improved={simulationResult.projectedAqi < simulationResult.currentAqi}
-            />
-            <div className="h-px bg-border/50" />
-            <ComparisonCard
-              label="Stress"
-              current={simulationResult.currentStressScore}
-              projected={simulationResult.projectedStressScore}
-              unit="Score"
-              improved={
-                simulationResult.projectedStressScore <
-                simulationResult.currentStressScore
-              }
-            />
-          </div>
+        <div className="space-y-4">
+          <ComparisonCard
+            current={simulationResult.currentAqi}
+            projected={simulationResult.projectedAqi}
+            unit="AQI"
+            improved={
+              simulationResult.projectedAqi <
+              simulationResult.currentAqi
+            }
+          />
 
-          {/* Risk Reduction */}
-          <div className="flex items-center justify-center gap-2 py-2 rounded-lg bg-gp-safe/5 border border-gp-safe/10">
-            <TrendingDown className="h-4 w-4 text-gp-safe" />
-            <span className="text-sm font-mono font-bold text-gp-safe tabular-nums">
-              <AnimatedSimNumber value={simulationResult.riskReduction} />%
-            </span>
-            <span className="text-xs font-mono text-muted-foreground">
-              Risk Reduction
-            </span>
-          </div>
-        </motion.div>
-      )}
+          <ComparisonCard
+            current={simulationResult.currentStressScore}
+            projected={simulationResult.projectedStressScore}
+            unit="Score"
+            improved={
+              simulationResult.projectedStressScore <
+              simulationResult.currentStressScore
+            }
+          />
 
-      {!loading && !simulationResult && trafficReduction === 0 && (
-        <div className="text-center py-6">
-          <p className="text-xs font-mono text-muted-foreground/50">
-            Adjust the slider to simulate traffic policy impact
-          </p>
+          <div className="text-center text-gp-safe font-mono font-bold">
+            <AnimatedSimNumber value={simulationResult.riskReduction} />%
+            Risk Reduction
+          </div>
         </div>
       )}
     </motion.div>

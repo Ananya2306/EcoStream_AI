@@ -1,9 +1,9 @@
-// GreenPulse AI – Environmental Intelligence Types
+// EcoStream AI – Environmental Intelligence Types
 
 export interface LiveMetrics {
   aqi: number
   temperature: number
-  stressScore: number
+  stress_score: number
   riskLevel: "Low" | "Moderate" | "High" | "Severe"
   timestamp: string
 }
@@ -43,6 +43,6 @@ export interface StreamingStatus {
 export interface MetricHistory {
   aqi: number[]
   temperature: number[]
-  stressScore: number[]
+  stress_score: number[]
   timestamps: string[]
 }

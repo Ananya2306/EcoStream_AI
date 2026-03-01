@@ -49,7 +49,7 @@ export const useEnvironmentalStore = create<EnvironmentalState>((set, get) => ({
   metricHistory: {
     aqi: [],
     temperature: [],
-    stressScore: [],
+    stress_score: [],
     timestamps: [],
   },
 
@@ -71,7 +71,7 @@ export const useEnvironmentalStore = create<EnvironmentalState>((set, get) => ({
       metricHistory: {
         aqi: [...history.aqi, metrics.aqi].slice(-MAX_HISTORY),
         temperature: [...history.temperature, metrics.temperature].slice(-MAX_HISTORY),
-        stressScore: [...history.stressScore, metrics.stressScore].slice(-MAX_HISTORY),
+        stress_score: [...history.stress_score, metrics.stress_score].slice(-MAX_HISTORY),
         timestamps: [...history.timestamps, now].slice(-MAX_HISTORY),
       },
     })

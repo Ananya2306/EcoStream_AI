@@ -64,13 +64,13 @@ export function LiveCharts() {
     time: ts,
     aqi: history.aqi[startIdx + i],
     temperature: history.temperature[startIdx + i],
-    stress: history.stressScore[startIdx + i],
+    stress: history.stress_score[startIdx + i],
   }))
 
   const correlationData = history.aqi.slice(startIdx).map((aqi, i) => ({
     aqi,
     temperature: history.temperature[startIdx + i],
-    stress: history.stressScore[startIdx + i],
+    stress: history.stress_score[startIdx + i],
   }))
 
   if (timeseriesData.length < 3) {

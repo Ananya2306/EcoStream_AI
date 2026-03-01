@@ -74,10 +74,10 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="text-xl font-mono font-bold text-foreground tracking-tight">
-                GreenPulse AI
+                EcoStream AI
               </h1>
               <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
-                Real-Time Environmental Intelligence
+                Real-Time Environmental Decision Engine
               </p>
             </div>
           </div>
@@ -125,7 +125,7 @@ export default function Dashboard() {
             <div className="sm:col-span-2 lg:col-span-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
                 <StressGauge
-                  score={liveMetrics?.stressScore ?? 0}
+                  score={liveMetrics?.stress_score ?? 0}
                   riskLevel={liveMetrics?.riskLevel ?? "Low"}
                 />
                 <AlertPanel />

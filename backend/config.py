@@ -1,1 +1,2 @@
-# Constants, thresholds, weights
+APP_NAME = "EcoStream AI"
+AQI_ALERT_THRESHOLD = 200
