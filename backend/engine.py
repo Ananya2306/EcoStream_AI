@@ -1,27 +1,16 @@
 import pathway as pw
-
-# =========================
-# Schema
-# =========================
 class InputSchema(pw.Schema): # type: ignore
     location: str
     aqi: int
     temperature: float
     timestamp: str
 
-
-# =========================
-# Streaming CSV Source
-# =========================
 source = pw.io.csv.read(
     "input.csv",
     schema=InputSchema,
     mode="streaming"
 )
 
-# =========================
-# Stress Calculation
-# =========================
 result = source.select(
     location=source.location,
     aqi=source.aqi,
@@ -30,9 +19,6 @@ result = source.select(
     timestamp=source.timestamp
 )
 
-# =========================
-# Write Output
-# =========================
 pw.io.csv.write(
     result,
     "output.csv"
