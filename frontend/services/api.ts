@@ -43,3 +43,11 @@ export async function simulatePolicy(aqi: number, temperature: number) {
   return res.json()
 }
 
+export async function fetchLocationAQI(lat:number, lon:number) {
+
+  const res = await fetch(
+    `https://your-backend-url/aqi-location?lat=${lat}&lon=${lon}`
+  )
+
+  return res.json()
+}

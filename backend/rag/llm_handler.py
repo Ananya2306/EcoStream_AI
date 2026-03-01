@@ -1,19 +1,26 @@
-def generate_response(question: str, context: dict):
+from rag.document_store import get_documents
+def generate_response(question, context):
 
-    aqi = context.get("aqi")
-    stress = context.get("stress_score")
+    docs = get_documents()
 
-    if aqi is None:
-        return {
-            "answer": "Environmental data currently unavailable.",
-            "citedStressScore": None,
-            "citedNewsSnippet": "Waiting for live environmental feed.",
-            "citedGuidelineSnippet": "WHO guideline: AQI above 200 is hazardous for human health."
-        }
+    location = context.get("location", "Unknown")
+    aqi = context.get("aqi", "N/A")
+    stress = context.get("stress_score", 0)
+
+    knowledge = docs[0]["content"]
+
+    answer = f"""
+Air quality in {location} is currently {aqi} AQI.
+
+Environmental stress score is {stress}.
+
+According to environmental guidelines:
+{knowledge}
+"""
 
     return {
-        "answer": f"Current AQI in {context.get('location')} is {aqi}. Air quality is being monitored in real time.",
+        "answer": answer.strip(),
         "citedStressScore": stress,
-        "citedNewsSnippet": "Real-time environmental monitoring data.",
-        "citedGuidelineSnippet": "WHO guideline: AQI above 200 is hazardous for human health."
+        "citedNewsSnippet": f"Real-time environmental monitoring data for {location}.",
+        "citedGuidelineSnippet": knowledge
     }

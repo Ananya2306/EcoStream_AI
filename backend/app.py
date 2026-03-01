@@ -76,3 +76,4 @@ def ask(data: AskRequest):
     response = generate_response(data.question, context)
 
     return response
+

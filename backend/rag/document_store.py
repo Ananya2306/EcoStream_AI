@@ -1,8 +1,30 @@
 def get_documents():
+
     return [
-        "WHO guideline: AQI above 200 is hazardous for human health.",
-        "AQI between 151 and 200 is considered unhealthy.",
-        "Reducing traffic emissions can significantly improve urban air quality.",
-        "High pollution exposure may cause respiratory issues and fatigue.",
-        "Government policies such as traffic control and green zones reduce pollution."
+
+        {
+            "title": "WHO Air Quality Guideline",
+            "content": "AQI above 200 is considered hazardous for human health and prolonged exposure may lead to respiratory and cardiovascular issues."
+        },
+
+        {
+            "title": "Environmental Health Research",
+            "content": "High air pollution exposure can increase stress levels, reduce productivity, and negatively impact cognitive performance."
+        },
+
+        {
+            "title": "Urban Climate Study",
+            "content": "Reducing urban traffic can significantly reduce PM2.5 levels and improve overall air quality in cities."
+        },
+
+        {
+            "title": "Public Health Advisory",
+            "content": "When AQI exceeds 150, sensitive groups including children, elderly, and people with asthma should limit outdoor exposure."
+        },
+
+        {
+            "title": "Climate Monitoring Insight",
+            "content": "Environmental stress score is a composite metric derived from pollution levels, temperature, and environmental risk indicators."
+        }
+
     ]
