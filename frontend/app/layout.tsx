@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'EcoStream AI - Real-Time Environmental Intelligence',
   description: 'Live environmental monitoring command center powered by Pathway streaming AI. Real-time AQI, temperature, stress scoring, and policy simulation.',
-  generator: 'v0.app',
+  generator: 'Next.js',
   icons: {
     icon: [
       {
